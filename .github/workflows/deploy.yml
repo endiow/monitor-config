@@ -1,0 +1,22 @@
+name: Deploy Monitor
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy monitor via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.ECS_HOST }}
+          username: ${{ secrets.ECS_SSH_USER }}
+          key: ${{ secrets.ECS_SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            cd /opt/monitor
+            git pull origin main
+            docker compose up -d
+            docker compose ps
