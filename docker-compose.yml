@@ -61,6 +61,21 @@ services:
     networks:
       - monitor-net
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: cadvisor
+    restart: always
+    mem_limit: 180m
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - monitor-net
+
 volumes:
   prom_data:
   grafana_data:
