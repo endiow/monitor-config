@@ -3,27 +3,68 @@ services:
     image: prom/prometheus:v2.53.0
     container_name: prometheus
     restart: always
+    mem_limit: 300m
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert-rules.yml:/etc/prometheus/alert-rules.yml
       - prom_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=7d'
+      - '--storage.tsdb.retention.time=2d'
+      - '--web.enable-lifecycle'
+    networks:
+      - monitor-net
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: alertmanager
+    restart: always
+    mem_limit: 120m
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager_data:/alertmanager
+    networks:
+      - monitor-net
 
   grafana:
     image: grafana/grafana-oss:11.2.0
     container_name: grafana
     restart: always
+    mem_limit: 220m
     ports:
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
     environment:
       - TZ=Asia/Shanghai
+    networks:
+      - monitor-net
+
+  node-exporter:
+    image: prom/node-exporter:v1.9.0
+    container_name: node-exporter
+    restart: always
+    mem_limit: 60m
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+    networks:
+      - monitor-net
 
 volumes:
   prom_data:
   grafana_data:
+  alertmanager_data:
+
+networks:
+  monitor-net:

@@ -1,0 +1,26 @@
+groups:
+- name: host-rules
+  rules:
+  - alert: InstanceDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "实例 {{ $labels.instance }} 失联"
+
+  - alert: MemoryLow
+    expr: node_memory_MemAvailable_bytes < 200 * 1024 * 1024
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "服务器可用内存小于200MB"
+
+  - alert: DiskAlmostFull
+    expr: 1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes) > 0.9
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "磁盘 {{ $labels.mountpoint }} 使用率>90%"

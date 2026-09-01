@@ -1,0 +1,29 @@
+global:
+  resolve_timeout: 3m
+
+smtp_configs:
+- smtp_smarthost: 'smtp.qq.com:587'
+  smtp_from: '2482315781@qq.com'
+  smtp_auth_username: '2482315781@qq.com'
+  smtp_auth_password: 'lcmziuiwkyyeecca'
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 10m
+  receiver: 'email-notify'
+
+receivers:
+- name: 'email-notify'
+  email_configs:
+  - to: "2482315781@qq.com"
+    send_resolved: true
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname','instance']
