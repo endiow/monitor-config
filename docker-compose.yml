@@ -61,23 +61,19 @@ services:
     networks:
       - monitor-net
 
-    cadvisor:
-    image: gcr.m.daocloud.io/cadvisor/cadvisor:v0.51.0
+  cadvisor:
+    image: ghcr.m.daocloud.io/google/cadvisor:v0.60.5
     container_name: cadvisor
     restart: always
     mem_limit: 180m
     ports:
       - "8081:8080"
-    command:
-      - --docker_only=true
-      - --storage_driver=overlay2
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /dev/disk:/dev/disk:ro
       - /var/lib/docker:/var/lib/docker:ro
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
     networks:
       - monitor-net
